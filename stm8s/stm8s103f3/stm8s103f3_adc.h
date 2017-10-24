@@ -7,6 +7,8 @@ pages 33,34
 #ifndef __STM8S103F_ADC_H
 #define __STM8S103F_ADC_H
 
+#include <stdint.h>
+
 #define ADC_CSR     *(unsigned char*)(0x5400) /* ADC control/status register */                 /* Reset status: 0x00 */
 #define ADC_CR1     *(unsigned char*)(0x5401) /* ADC configuration register 1 */                /* Reset status: 0x00 */
 #define ADC_CR2     *(unsigned char*)(0x5402) /* ADC configuration register 2 */                /* Reset status: 0x00 */
@@ -24,6 +26,33 @@ pages 33,34
 #define ADC_AWCRH   *(unsigned char*)(0x540E) /* ADC analog watchdog control register high */   /* Reset status: 0x00 */
 #define ADC_AWCRL   *(unsigned char*)(0x540F) /* ADC analog watchdog control register low */    /* Reset status: 0x00 */
 
-#error "Also need add ADC data registers"
+// test code for first stage
+uint16_t ADC_DBxR(uint8_t buffer) {
+    uint16_t temph = 0;
+    uint8_t templ = 0;
+  
+    // Check the parameters
+    if (buffer > 9) {
+        return 0;
+    }
+  
+    if ((ADC_CR2 & 0x08) != 0) { // Right alignment
+        // Read LSB first
+        templ = *(uint8_t*)(uint16_t)((uint16_t)0x53E0 + (uint8_t)(buffer << 1) + 1);
+        // Then read MSB
+        temph = *(uint8_t*)(uint16_t)((uint16_t)0x53E0 + (uint8_t)(buffer << 1));
+        temph = (uint16_t)(templ | (uint16_t)(temph << (uint8_t)8));
+    } else { // Left alignment 
+        // Read MSB first
+        temph = *(uint8_t*)(uint16_t)((uint16_t)0x53E0 + (uint8_t)(buffer << 1));
+        // Then read LSB
+        templ = *(uint8_t*)(uint16_t)((uint16_t)0x53E0 + (uint8_t)(buffer << 1) + 1);
+        temph = (uint16_t)((uint16_t)((uint16_t)templ << 6) | (uint16_t)(temph << 8));
+    }
+
+    return ((uint16_t)temph);
+}
+
+// #error "Also need add ADC data registers"
 
 #endif /* __STM8S103F_ADC_H */
