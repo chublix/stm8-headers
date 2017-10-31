@@ -12,6 +12,7 @@
         #include "stm8s103f3/stm8s103f3_flash.h"
         #include "stm8s103f3/stm8s103f3_timers.h"
         #include "stm8s103f3/stm8s103f3_adc.h"
+        #include "stm8s103f3/stm8s103f3_itc.h"
     #elif MCU == stm8s003f3
         #error "Not implemented yet. Headers for stm8s103f3 can be used for stm8s003f3"
     #else
